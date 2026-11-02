@@ -24,6 +24,7 @@ collect() {
         mkdir -p "$(dirname "$dst")"
         rsync -a --no-owner --no-group \
               --exclude='*.bak' --exclude='*.bak-*' --exclude='*.orig' --exclude='*.before-restore' \
+              --exclude='*.pacsave' --exclude='*.pacnew' \
               "$src" "$(dirname "$dst")/"
     done < files.txt
     # Package lists, to reinstall everything on a fresh system

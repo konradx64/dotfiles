@@ -26,7 +26,6 @@ check
 clang
 clblast
 cmake
-cosmic-session
 cowsay
 cups
 ddcui
@@ -45,6 +44,7 @@ emscripten
 ethtool
 ex-vi-compat
 expac
+fd
 ffmpegthumbs
 filezilla
 firefox
@@ -69,13 +69,13 @@ gst-plugin-pipewire
 gst-plugins-bad
 gst-plugins-ugly
 guvcview
+gvfs
 handbrake
 hcloud
 helvum
 htop
 hypridle
 hyprland
-hyprlauncher
 hyprlock
 hyprpaper
 hyprpolkitagent
@@ -97,6 +97,7 @@ krdc
 kup
 kwalletmanager
 less
+libappindicator
 libdvdcss
 libpulse
 libreoffice-fresh
@@ -106,8 +107,6 @@ libxres
 linux
 linux-firmware
 linux-headers
-linux-zen
-linux-zen-headers
 lshw
 luarocks
 lutris
@@ -124,7 +123,6 @@ msedit
 musescore
 neovim
 net-tools
-network-manager-applet
 nm-connection-editor
 nmap
 nodejs
@@ -151,7 +149,6 @@ plocate
 pmbootstrap
 postgresql
 power-profiles-daemon
-proton-vpn-gtk-app
 pyenv
 pyright
 python-docx
@@ -184,6 +181,7 @@ s-tui
 s3cmd
 satty
 screen
+sdl12-compat
 seahorse
 sfizz
 signal-desktop
@@ -216,7 +214,6 @@ valkey
 vde2
 vegeta
 virt-manager
-virtualbox
 vnstat
 vulkan-extra-tools
 vulkan-radeon
@@ -227,6 +224,7 @@ wayland-protocols
 wget
 wine
 winetricks
+wireguard-tools
 wireless_tools
 wireplumber
 wireshark-qt
