@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# screenshot — take a screenshot, save it, copy it, and offer to edit it.
+#
+#   screenshot area     select a region with the mouse          (Print)
+#   screenshot window   the focused window                      (ALT+Print)
+#   screenshot screen   the monitor the mouse is on             (SHIFT+Print)
+#   screenshot edit     select a region and open it in satty    (SUPER+Print)
+#
+# Saved to ~/Pictures/Screenshots (same naming as KDE's Spectacle) and copied to
+# the clipboard. The notification has an "Edit" button that opens satty to draw
+# arrows/boxes/text; satty's save/copy buttons write back to the same folder.
+set -uo pipefail
+
+dir="$HOME/Pictures/Screenshots"
+mkdir -p "$dir"
+file="$dir/Screenshot_$(date +%Y%m%d_%H%M%S).png"
+mode="${1:-area}"
+
+edit() {  # open a screenshot in satty
+    if ! command -v satty >/dev/null; then
+        notify-send -a Screenshot -u critical "Can't edit: satty isn't installed" \
+            "Install it with: sudo pacman -S satty"
+        return 1
+    fi
+    satty --filename "$1" \
+          --output-filename "$dir/Screenshot_%Y%m%d_%H%M%S_edited.png" \
+          --copy-command wl-copy \
+          --save-after-copy \
+          --initial-tool arrow \
+          --early-exit save copy
+}
+
+case "$mode" in
+    area|edit)
+        # Escape during selection cancels without doing anything
+        geom=$(slurp -d -b '#00000066' -c '#90cef4ff' -w 2) || exit 0
+        grim -g "$geom" "$file" ;;
+    window)
+        geom=$(hyprctl -j activewindow | python3 -I -c '
+import json, sys
+w = json.load(sys.stdin)
+if not w: sys.exit(1)
+(x, y), (wd, ht) = w["at"], w["size"]
+print(f"{x},{y} {wd}x{ht}")') || { notify-send -a Screenshot "No focused window"; exit 1; }
+        grim -g "$geom" "$file" ;;
+    screen)
+        mon=$(hyprctl -j monitors | python3 -I -c '
+import json, sys
+print(next(m["name"] for m in json.load(sys.stdin) if m["focused"]))')
+        grim -o "$mon" "$file" ;;
+    *)
+        echo "usage: screenshot area|window|screen|edit" >&2; exit 2 ;;
+esac
+
+[[ -s "$file" ]] || { notify-send -a Screenshot -u critical "Screenshot failed"; exit 1; }
+wl-copy --type image/png < "$file"
+
+if [[ "$mode" == "edit" ]]; then
+    edit "$file"
+    exit 0
+fi
+
+# Notification with a thumbnail and buttons (waits in the background for a click)
+action=$(notify-send -a Screenshot -i "$file" \
+    -A edit="Edit" -A open="Open folder" \
+    "Screenshot saved" "Copied to clipboard\n${file/#$HOME/\~}")
+case "$action" in
+    edit) edit "$file" ;;
+    open) dolphin --select "$file" >/dev/null 2>&1 || xdg-open "$dir" ;;   # opens the folder with the new screenshot highlighted
+esac

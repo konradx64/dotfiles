@@ -1,0 +1,39 @@
+# What `dotfiles save` backs up. One path per line:
+#   relative paths = inside your home folder (~)   -> saved to home/
+#   /absolute paths = system files                 -> saved to system/
+# Folders are copied whole (*.bak / *.orig backups are skipped).
+
+# ---------- Hyprland ----------
+.config/hypr
+
+# ---------- bar, notifications, launcher, terminal ----------
+.config/waybar
+.config/swaync
+.config/rofi
+.config/alacritty
+
+# ---------- theme generator (colors from the wallpaper) ----------
+.config/matugen
+
+# ---------- own scripts ----------
+.local/bin/wallpaper
+.local/bin/screenshot
+.local/bin/powermenu
+.local/bin/gamemode
+
+# ---------- misc ----------
+.config/autostart/blueman.desktop
+
+# ---------- system: login screen ----------
+/etc/greetd/config.toml
+/etc/greetd/tuigreet.sh
+/etc/tuigreet/config.toml
+/etc/pam.d/greetd
+/etc/systemd/system/greetd.service.d
+
+# ---------- system: boot + logs ----------
+/boot/loader/loader.conf
+/boot/loader/entries
+/etc/mkinitcpio.conf
+/etc/mkinitcpio.d
+/etc/systemd/journald.conf.d

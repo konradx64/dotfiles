@@ -1,0 +1,229 @@
+// Waybar config — see `man waybar` and https://github.com/Alexays/Waybar/wiki
+// Two bars, both on the main (left) monitor: the top bar, and the desktop clock
+// further down. The side monitor has no bar.
+//
+// Icons are Nerd Font glyphs (they may look blank in some editors; they show in the bar).
+// Find more at https://www.nerdfonts.com/cheat-sheet. You can paste a glyph, or type it
+// as a "\uXXXX" escape using its 4-digit code (e.g. "\uf303" = Arch logo).
+[
+{
+    "output": "HDMI-A-1",
+    "layer": "top",
+    "position": "top",
+    "height": 40,
+    "margin-top": 8,
+    "margin-left": 8,
+    "margin-right": 8,
+    "spacing": 4,
+
+    "modules-left":   ["custom/arch", "hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["mpris"],     // time + date are on the desktop (second bar below)
+    "modules-right":  ["tray", "idle_inhibitor", "custom/power-profile", "group/system", "group/audio", "bluetooth", "network", "custom/notification", "custom/power"],
+
+    // ---------- left ----------
+
+    // Arch logo: click = app launcher
+    "custom/arch": {
+        "format": "",
+        "tooltip": true,
+        "tooltip-format": "Apps (SUPER+Space)",
+        "on-click": "pkill -x rofi || rofi -show drun"
+    },
+
+    // Workspaces 1-5 always visible (built-in module, no scripts).
+    // Note: clicking a number doesn't switch yet (Waybar still sends Hyprland's old
+    // dispatch syntax); use SUPER+1..5. Should start working after a Waybar update.
+    "hyprland/workspaces": {
+        "format": "{name}",
+        "persistent-workspaces": { "HDMI-A-1": 5 },
+        "all-outputs": false,
+        "show-special": false
+    },
+
+    "hyprland/window": {
+        "max-length": 50,
+        "separate-outputs": true,
+        "icon": true,              // the app's real icon in front of the title
+        "icon-size": 18,
+        "rewrite": {
+            // drop symbols some apps put in front of their title (spinners, emoji, ...)
+            "^[^A-Za-z0-9(\\[]+(.+)$": "$1"
+        }
+    },
+
+    // ---------- center ----------
+
+    // Now playing (Spotify, YouTube in Firefox, ...). Hidden when nothing is playing.
+    // Blue play icon = playing, grey pause icon = paused.
+    // Click = play/pause, right-click = next, middle-click = previous
+    "mpris": {
+        "format": "{status_icon}  {title}",
+        "title-len": 25,           // longer titles get shortened with "..."
+        "ellipsis": "\u2026",
+        "status-icons": {
+            "playing": "\uf04b",
+            "paused": "\uf04c",
+            "stopped": "\uf04d"
+        },
+        "tooltip-format": "{player}: {title}\n{artist}  {album}",
+        "on-click": "playerctl play-pause",
+        "on-click-right": "playerctl next",
+        "on-click-middle": "playerctl previous"
+    },
+
+    "clock": {
+        "format": "{:%H:%M}",           // date is on the desktop (second bar below)
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "weeks-pos": "left",
+            "on-scroll": 1
+        },
+        "actions": {
+            "on-scroll-up": "shift_up",
+            "on-scroll-down": "shift_down"
+        }
+    },
+
+    // ---------- right ----------
+
+    "tray": {
+        "icon-size": 20,
+        "spacing": 10
+    },
+
+    // "Stay awake" toggle (like KDE's "block sleep and screen locking").
+    // Click: blue cup = screen never locks / turns off; grey cup = normal.
+    // Resets to off after a reboot/login.
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "",
+            "deactivated": ""
+        },
+        "tooltip-format-activated": "Stay awake: ON\nScreen won't lock or turn off",
+        "tooltip-format-deactivated": "Stay awake: off\nClick to keep the PC awake",
+        "start-activated": false
+    },
+
+    // Bolt = performance, scale = balanced, leaf = power saver. Click to cycle.
+    "custom/power-profile": {
+        "exec": "~/.config/waybar/scripts/power-profile.sh",
+        "return-type": "json",
+        "interval": 30,
+        "signal": 8,
+        "on-click": "~/.config/waybar/scripts/power-profile.sh next"
+    },
+
+    "group/system": {
+        "orientation": "horizontal",
+        "modules": ["cpu", "memory"]
+    },
+    "cpu": {
+        "format": "  {usage}%",
+        "interval": 2,
+        "on-click": "alacritty -e btop"
+    },
+    "memory": {
+        "format": "  {percentage}%",
+        "interval": 5,
+        "tooltip-format": "{used:0.1f} / {total:0.1f} GiB used",
+        "on-click": "alacritty -e btop"
+    },
+
+    // Sound: icon + % (scroll = volume, click = mixer, right-click = mute) and a slider
+    "group/audio": {
+        "orientation": "horizontal",
+        "modules": ["pulseaudio", "pulseaudio/slider"]
+    },
+    "pulseaudio": {
+        "format": "{icon}  {volume}%",
+        "format-muted": "  muted",
+        "format-icons": {
+            "headphone": "",
+            "default": ["", "", ""]
+        },
+        "scroll-step": 5,
+        "tooltip-format": "{desc}",
+        "on-click": "pavucontrol",
+        "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+    },
+    "pulseaudio/slider": {
+        "min": 0,
+        "max": 100,
+        "orientation": "horizontal"
+    },
+
+    // Bluetooth: grey = off, white = on, blue + number = devices connected. Click = manager.
+    "bluetooth": {
+        "format": "",
+        "format-off": "",
+        "format-disabled": "",
+        "format-connected": "  {num_connections}",
+        "tooltip-format": "Bluetooth: {status}",
+        "tooltip-format-connected": "Connected:\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}",
+        "on-click": "blueman-manager"
+    },
+
+    "network": {
+        "format-ethernet": "",
+        "format-wifi": "  {essid}",
+        "format-disconnected": "",
+        "tooltip-format": "{ifname}: {ipaddr}\n↓ {bandwidthDownBytes}  ↑ {bandwidthUpBytes}",
+        "tooltip-format-disconnected": "Offline",
+        "interval": 5,
+        "on-click": "nm-connection-editor"
+    },
+
+    // Bell for swaync: click = notification center, right-click = do-not-disturb
+    "custom/notification": {
+        "tooltip": false,
+        "format": "{icon}",
+        "format-icons": {
+            "notification": "",
+            "none": "",
+            "dnd-notification": "",
+            "dnd-none": "",
+            "inhibited-notification": "",
+            "inhibited-none": "",
+            "dnd-inhibited-notification": "",
+            "dnd-inhibited-none": ""
+        },
+        "return-type": "json",
+        "exec": "swaync-client -swb",
+        "on-click": "swaync-client -t -sw",
+        "on-click-right": "swaync-client -d -sw",
+        "escape": true
+    },
+
+    // Power button: lock / suspend / log out / reboot / shut down (also SUPER+Escape)
+    "custom/power": {
+        "format": "",
+        "tooltip": true,
+        "tooltip-format": "Power menu (SUPER+Escape)",
+        "on-click": "~/.local/bin/powermenu"
+    }
+},
+
+// ===================== Desktop clock =====================
+// A second, invisible "bar" behind the windows that only shows a big clock + date.
+// Windows cover it like a desktop widget; it takes no space and lets clicks through.
+{
+    "name": "desktop",             // CSS: window#waybar.desktop
+    "output": "HDMI-A-1",
+    "layer": "bottom",             // below windows
+    "position": "top",
+    "margin-top": 200,             // distance from the top of the screen
+    "exclusive": false,            // don't push windows away
+    "passthrough": true,           // clicks go through to the desktop
+    "modules-center": ["group/desktop-clock"],
+
+    "group/desktop-clock": {
+        "orientation": "vertical",
+        "modules": ["clock#time", "clock#date"]
+    },
+    "clock#time": { "format": "{:%H:%M}", "tooltip": false },
+    "clock#date": { "format": "{:%A, %d %B %Y}", "tooltip": false, "interval": 60 }
+}
+]

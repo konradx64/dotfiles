@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# dotfiles — back up this PC's configs into ~/dotfiles (git) and push to GitHub.
+#
+#   dotfiles save ["message"]   copy the configs into the repo, commit, push
+#   dotfiles status             show what changed since the last save
+#   dotfiles restore            copy the saved home configs back onto this PC
+#
+# What gets backed up is listed in files.txt (one path per line).
+# Files are copied, not linked — your real configs are never moved or touched by `save`.
+set -euo pipefail
+
+repo="$(dirname "$(readlink -f "$0")")"
+cd "$repo"
+
+# Copy everything in files.txt into home/ and system/ (fresh each time, so
+# deleted files disappear from the backup too).
+collect() {
+    rm -rf home system
+    local p src dst
+    while read -r p; do
+        [[ -z $p || $p == \#* ]] && continue
+        if [[ $p == /* ]]; then src="$p"; dst="system$p"; else src="$HOME/$p"; dst="home/$p"; fi
+        if [[ ! -e $src ]]; then echo "  skipped (not found): $p" >&2; continue; fi
+        mkdir -p "$(dirname "$dst")"
+        rsync -a --no-owner --no-group \
+              --exclude='*.bak' --exclude='*.bak-*' --exclude='*.orig' --exclude='*.before-restore' \
+              "$src" "$(dirname "$dst")/"
+    done < files.txt
+    # Package lists, to reinstall everything on a fresh system
+    pacman -Qqen > packages.txt   # official repos
+    pacman -Qqem > packages-aur.txt  # AUR
+}
+
+case "${1:-}" in
+    save)
+        collect
+        git add -A
+        if git diff --cached --quiet; then
+            echo "Nothing changed since the last save."
+        else
+            git commit -q -m "${2:-Backup $(date '+%Y-%m-%d %H:%M')}"
+            echo "Saved: $(git log -1 --format='%h %s')"
+        fi
+        if git remote get-url origin >/dev/null 2>&1; then
+            git push -q && echo "Pushed to $(git remote get-url origin)"
+        fi
+        ;;
+    status)
+        collect
+        git add -A
+        if git diff --cached --quiet; then echo "Everything is saved."; else git diff --cached --stat; fi
+        git reset -q
+        ;;
+    restore)
+        echo "This copies the saved configs from home/ over your current ones."
+        echo "Existing files are kept as <name>.before-restore."
+        read -rp "Continue? [y/N] " a
+        [[ $a == [yY] ]] || exit 1
+        (cd home && find . -type f -printf '%P\n') | while read -r f; do
+            install -D -b -S .before-restore -m "$(stat -c %a "home/$f")" "home/$f" "$HOME/$f"
+        done
+        echo "Home configs restored."
+        echo "System files (login screen, boot menu, ...) are in system/ — copy the ones you"
+        echo "need with sudo. Check the PARTUUID in system/boot/loader/entries first!"
+        ;;
+    *)
+        sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'
+        ;;
+esac

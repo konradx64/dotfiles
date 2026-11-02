@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# wallpaper — set a new wallpaper and re-theme everything from its colors.
+#
+#   wallpaper ~/Pictures/Wallpapers/something.jpg
+#   wallpaper            (no argument: re-apply the current wallpaper/theme)
+#
+# Updates ~/.config/hypr/hyprpaper.conf, restarts hyprpaper, then runs matugen,
+# which rewrites the colors for Hyprland, Waybar, swaync and hyprlauncher
+# (templates in ~/.config/matugen/templates/).
+set -euo pipefail
+
+conf="$HOME/.config/hypr/hyprpaper.conf"
+
+if [[ $# -ge 1 ]]; then
+    img=$(realpath -- "$1")
+    [[ -f "$img" ]] || { echo "wallpaper: no such file: $1" >&2; exit 1; }
+    # Only touch the "path = ..." line inside hyprpaper.conf
+    sed -i "s|^\(\s*path\s*=\s*\).*|\1${img//|/\\|}|" "$conf"
+else
+    img=$(sed -n 's|^\s*path\s*=\s*||p' "$conf" | head -1)
+    img="${img/#\~/$HOME}"
+fi
+
+# Restart hyprpaper with the new image
+pkill -x hyprpaper || true
+setsid -f hyprpaper >/dev/null 2>&1
+
+# Generate + apply the color theme (dark mode, most colorful source color)
+matugen image "$img" --mode dark --prefer saturation --quiet
+
+echo "Wallpaper + theme set from: $img"

@@ -1,0 +1,11 @@
+# /etc/greetd/config.toml — login screen: greetd + tuigreet (replaces SDDM)
+# Layout/options: /etc/tuigreet/config.toml    Colors + font: /etc/greetd/tuigreet.sh
+# Original file backed up as /etc/greetd/config.toml.bak
+
+[terminal]
+# Show the login screen on the first console
+vt = 1
+
+[default_session]
+command = "/etc/greetd/tuigreet.sh"
+user = "greeter"

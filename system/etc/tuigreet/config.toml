@@ -1,0 +1,56 @@
+# /etc/tuigreet/config.toml — login screen layout (tuigreet 0.11)
+# Colors + font are set in /etc/greetd/tuigreet.sh.
+# Keys on the login screen: F3 = choose session (Hyprland / Plasma / COSMIC), F12 = power
+
+[display]
+show_time = true
+time_format = "%H:%M  ·  %A, %d %B %Y"
+greeting = "Welcome back"
+show_title = false            # no "Authenticate into archlinux" header
+align_greeting = "center"
+
+[remember]
+username = true               # pre-fills your user, you only type the password
+user_session = true           # remembers the session you picked last (per user)
+
+[user_menu]
+enabled = true                # if no user is remembered: pick from a list instead of typing
+
+[secret]
+mode = "characters"           # show a dot per typed character
+characters = "•"
+
+[layout]
+width = 46
+window_padding = 2
+container_padding = 2
+prompt_padding = 1
+
+[layout.widgets]
+time_position = "top"
+status_position = "bottom"
+
+[layout.widgets.status_bar]
+show_session = true           # F3 + current session name
+show_power = true             # F12
+show_caps_lock = true
+show_session_status = true
+show_command = false          # hide F2 "change command"
+show_reset = false
+show_background = false       # hide F4 background animations
+
+[power]
+shutdown = "systemctl poweroff"
+reboot = "systemctl reboot"
+
+[theme]
+border = "blue"
+container = "black"
+text = "white"
+time = "blue"
+title = "blue"
+greet = "white"
+prompt = "blue"
+input = "white"
+action = "darkgray"
+button = "blue"

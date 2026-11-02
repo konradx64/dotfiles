@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# gamemode — toggle a lighter, faster Hyprland for gaming (SUPER+G).
+#
+# ON:  animations, blur and shadows off; tearing allowed for Steam games
+#      (lower input lag in fullscreen); power profile -> performance.
+# OFF: reloads your normal Hyprland config and restores the previous power profile.
+#
+# Game mode also ends on its own if Hyprland's config is reloaded.
+
+state="${XDG_RUNTIME_DIR:-/tmp}/gamemode-prev-profile"
+
+if [[ "$(hyprctl getoption animations:enabled | head -1)" == "bool: true" ]]; then
+    # ---- turn ON ----
+    powerprofilesctl get > "$state" 2>/dev/null
+    hyprctl eval 'hl.config({
+        animations = { enabled = false },
+        decoration = { blur = { enabled = false }, shadow = { enabled = false } },
+        general    = { allow_tearing = true },
+    })' >/dev/null
+    powerprofilesctl set performance
+    pkill -RTMIN+8 -x waybar   # refresh the power-profile icon in the bar
+    notify-send -a "Game mode" -i input-gaming "Game mode ON" \
+        "Animations, blur and shadows off · performance profile\nSUPER+G to turn off"
+else
+    # ---- turn OFF ----
+    hyprctl reload >/dev/null
+    prev=$(cat "$state" 2>/dev/null)
+    powerprofilesctl set "${prev:-balanced}"
+    rm -f "$state"
+    pkill -RTMIN+8 -x waybar
+    notify-send -a "Game mode" -i input-gaming "Game mode off" "Back to normal"
+fi

@@ -1,0 +1,194 @@
+/* Colors come from colors.css, which matugen regenerates from your wallpaper
+   (run `wallpaper <image>`).
+   Defines: @bg @surface @surface_hi @fg @muted @accent @on_accent @accent2 @urgent */
+@import "colors.css";
+
+* {
+    font-family: "JetBrainsMono Nerd Font Propo", "Noto Sans", sans-serif;  /* Propo = icons get exact widths, so they center properly */
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 0;
+    border: none;
+    border-radius: 0;
+}
+
+/* One rounded bar, 8px from the screen edges */
+window#waybar {
+    background: alpha(@bg, 0.7);   /* 1.0 = solid, lower = more see-through */
+    border: 1px solid alpha(@surface_hi, 0.9);
+    border-radius: 14px;
+    color: @fg;
+}
+
+tooltip {
+    background: @bg;
+    border: 1px solid @accent;
+    border-radius: 10px;
+}
+tooltip label { color: @fg; }
+
+/* ---------- modules: no boxes of their own, just a soft highlight on hover ---------- */
+#custom-arch,
+#workspaces,
+#window,
+#clock,
+#mpris,
+#tray,
+#idle_inhibitor,
+#custom-power-profile,
+#system,
+#audio,
+#bluetooth,
+#network,
+#custom-notification,
+#custom-power {
+    background: transparent;
+    border-radius: 8px;
+    padding: 0 14px;
+    margin: 3px 0;
+}
+#clock:hover,
+#idle_inhibitor:hover,
+#custom-power-profile:hover,
+#system:hover,
+#audio:hover,
+#bluetooth:hover,
+#network:hover,
+#custom-notification:hover {
+    background: alpha(@surface_hi, 0.8);
+}
+
+/* ---------- Arch logo ---------- */
+#custom-arch {
+    color: @accent;
+    font-size: 21px;
+    padding: 0 16px;
+    margin-left: 6px;
+}
+#custom-arch:hover { background: @accent; color: @on_accent; }
+
+/* ---------- workspaces ---------- */
+#workspaces { padding: 0 4px; }
+
+#workspaces button {
+    color: @muted;
+    background: transparent;
+    padding: 0 11px;
+    margin: 4px 2px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: none;
+    text-shadow: none;
+    min-width: 0;
+}
+#workspaces button:not(.empty) {                  /* has windows */
+    color: @fg;
+    background: alpha(@surface_hi, 0.9);
+}
+#workspaces button.active {
+    color: @on_accent;
+    background: @accent;
+}
+#workspaces button:hover {
+    color: @fg;
+    background: @surface_hi;
+    box-shadow: none;
+}
+#workspaces button.active:hover { color: @on_accent; background: @accent; }
+#workspaces button.urgent { color: @urgent; }
+
+/* ---------- window title ---------- */
+#window { color: @fg; font-weight: 500; }
+#window image { margin-right: 8px; }   /* space between app icon and title */
+window#waybar.empty #window { background: transparent; border-color: transparent; }
+
+/* ---------- clock ---------- */
+#clock { color: @fg; padding: 0 16px; }
+
+/* ---------- media ---------- */
+#mpris { color: @accent; font-weight: 500; }           /* blue = playing */
+#mpris.paused, #mpris.stopped { color: @muted; }      /* grey = paused */
+
+/* ---------- tray ---------- */
+#tray > .needs-attention { background: @urgent; border-radius: 6px; }
+#tray menu { background: @bg; color: @fg; }
+
+/* ---------- stay awake ---------- */
+#idle_inhibitor { color: @muted; font-size: 17px; padding: 0 15px; }
+#idle_inhibitor.activated { color: @on_accent; background: @accent; }
+
+/* ---------- power profile ---------- */
+#custom-power-profile { font-size: 17px; padding: 0 15px; }
+#custom-power-profile.performance { color: @urgent; }
+#custom-power-profile.balanced    { color: @accent; }
+#custom-power-profile.power-saver { color: @accent2; }
+
+/* ---------- cpu / memory ---------- */
+#cpu    { color: @fg; padding-right: 10px; }
+#memory { color: @fg; padding-left: 4px; }
+
+/* ---------- sound ---------- */
+#pulseaudio { color: @fg; padding-right: 8px; }
+#pulseaudio.muted { color: @muted; }
+
+#pulseaudio-slider { padding: 0; min-width: 110px; }
+#pulseaudio-slider slider {
+    min-width: 0; min-height: 0;
+    background: transparent;
+    box-shadow: none;
+    border: none;
+}
+#pulseaudio-slider trough {
+    min-height: 6px;
+    min-width: 110px;
+    border-radius: 4px;
+    background: @surface_hi;
+}
+#pulseaudio-slider highlight {
+    min-height: 6px;
+    border-radius: 4px;
+    background: @accent;
+}
+
+/* ---------- bluetooth ---------- */
+#bluetooth { color: @fg; font-size: 17px; padding: 0 15px; }
+#bluetooth.off, #bluetooth.disabled, #bluetooth.no-controller { color: @muted; }
+#bluetooth.connected { color: @accent; }
+
+/* ---------- network ---------- */
+#network { color: @fg; font-size: 17px; padding: 0 15px; }
+#network.disconnected { color: @muted; }
+
+/* ---------- notifications ---------- */
+#custom-notification { font-size: 17px; padding: 0 15px; }
+#custom-notification.notification,
+#custom-notification.inhibited-notification { color: @accent; }
+#custom-notification.dnd-none,
+#custom-notification.dnd-notification { color: @muted; }
+
+/* ---------- power button ---------- */
+#custom-power { color: @urgent; font-size: 17px; padding: 0 15px; margin-right: 6px; }
+#custom-power:hover { background: @urgent; color: @bg; }
+
+/* ===================== Desktop clock (second bar, see config.jsonc) ===================== */
+window#waybar.desktop {
+    background: transparent;
+    border: none;
+}
+window#waybar.desktop #clock.time,
+window#waybar.desktop #clock.date {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+}
+window#waybar.desktop #clock.time {
+    color: @fg;
+    font-size: 104px;
+    font-weight: 800;
+}
+window#waybar.desktop #clock.date {
+    color: @accent;
+    font-size: 24px;
+    font-weight: 600;
+}

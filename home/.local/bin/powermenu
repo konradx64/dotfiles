@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# powermenu — lock / suspend / log out / reboot / shut down, via rofi.
+# Opened with SUPER+Escape or the power icon in Waybar. Pressing the key again closes it.
+# Log out, reboot and shut down ask for confirmation so a misclick can't lose your work.
+
+pkill -x rofi && exit 0   # toggle: close if a rofi menu is already open
+
+# Small, list-only variant of the launcher theme (~/.config/rofi/config.rasi)
+theme='window { width: 280px; } mainbox { children: [ listview ]; }
+       listview { lines: 5; } element-icon { size: 26px; }'
+
+menu() {  # $1 = prompt, rest = "Label:icon-name" entries; prints the chosen label
+    local prompt="$1"; shift
+    for item in "$@"; do printf '%s\0icon\x1f%s\n' "${item%%:*}" "${item##*:}"; done |
+        rofi -dmenu -i -p "$prompt" -theme-str "$theme" -no-custom
+}
+
+confirm() {  # $1 = action name; returns success only on "Yes"
+    local theme_confirm='window { width: 280px; } mainbox { children: [ message, listview ]; }
+                         listview { lines: 2; } textbox { horizontal-align: 0.5; }'
+    [[ "$(printf 'Yes, %s\nCancel\n' "$1" | rofi -dmenu -i -p "" -mesg "Really $1?" \
+          -theme-str "$theme_confirm" -no-custom)" == "Yes, $1" ]]
+}
+
+choice=$(menu "Power" \
+    "Lock:system-lock-screen" \
+    "Suspend:system-suspend" \
+    "Log out:system-log-out" \
+    "Reboot:system-reboot" \
+    "Shut down:system-shutdown")
+
+case "$choice" in
+    "Lock")      pidof hyprlock || hyprlock ;;
+    "Suspend")   systemctl suspend ;;                  # hypridle locks the screen first
+    "Log out")   confirm "log out"   && hyprctl dispatch 'hl.dsp.exit()' ;;
+    "Reboot")    confirm "reboot"    && systemctl reboot ;;
+    "Shut down") confirm "shut down" && systemctl poweroff ;;
+esac

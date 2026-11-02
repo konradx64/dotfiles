@@ -1,0 +1,56 @@
+# matugen — generates a color theme from the wallpaper and writes it into each app.
+# Don't run this directly; use `wallpaper <image>` (~/.local/bin/wallpaper),
+# which also swaps the wallpaper itself.
+#
+# Each template below lives in ~/.config/matugen/templates/. Edit the template,
+# not the output file — outputs get overwritten on every wallpaper change.
+
+[config]
+
+# Fixed terminal colors, automatically shifted toward the wallpaper's hue so they match.
+# Used as colors.red, colors.on_red_container, etc. in the alacritty template.
+[config.custom_colors]
+red     = "#e06c75"
+green   = "#98c379"
+yellow  = "#e5c07b"
+blue    = "#61afef"
+magenta = "#c678dd"
+cyan    = "#56b6c2"
+
+# Hyprland window borders etc.  (required by ~/.config/hypr/hyprland.lua)
+[templates.hyprland]
+input_path  = "~/.config/matugen/templates/hyprland-colors.lua"
+output_path = "~/.config/hypr/colors.lua"
+post_hook   = "hyprctl reload >/dev/null"
+
+# Waybar  (imported by ~/.config/waybar/style.css)
+[templates.waybar]
+input_path  = "~/.config/matugen/templates/waybar-colors.css"
+output_path = "~/.config/waybar/colors.css"
+post_hook   = "pkill -SIGUSR2 -x waybar || true"
+
+# swaync notifications + notification center
+[templates.swaync]
+input_path  = "~/.config/matugen/templates/swaync-style.css"
+output_path = "~/.config/swaync/style.css"
+post_hook   = "swaync-client -rs >/dev/null 2>&1 || true"
+
+# hyprtoolkit = theme for the polkit password dialog (hyprpolkitagent)
+[templates.hyprtoolkit]
+input_path  = "~/.config/matugen/templates/hyprtoolkit.conf"
+output_path = "~/.config/hypr/hyprtoolkit.conf"
+
+# hyprlock lock screen (wallpaper + colors)
+[templates.hyprlock]
+input_path  = "~/.config/matugen/templates/hyprlock.conf"
+output_path = "~/.config/hypr/hyprlock.conf"
+
+# rofi app launcher  (imported by ~/.config/rofi/config.rasi; read fresh on every open)
+[templates.rofi]
+input_path  = "~/.config/matugen/templates/rofi-colors.rasi"
+output_path = "~/.config/rofi/colors.rasi"
+
+# Alacritty terminal  (imported by ~/.config/alacritty/alacritty.toml; reloads live)
+[templates.alacritty]
+input_path  = "~/.config/matugen/templates/alacritty-colors.toml"
+output_path = "~/.config/alacritty/colors.toml"
