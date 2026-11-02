@@ -1,6 +1,6 @@
 // Waybar config — see `man waybar` and https://github.com/Alexays/Waybar/wiki
-// Two bars, both on the main (left) monitor: the top bar, and the desktop clock
-// further down. The side monitor has no bar.
+// Two bars: the top bar (main/left monitor only), and the desktop clock further
+// down (on both monitors). The side monitor has no top bar.
 //
 // Icons are Nerd Font glyphs (they may look blank in some editors; they show in the bar).
 // Find more at https://www.nerdfonts.com/cheat-sheet. You can paste a glyph, or type it
@@ -209,14 +209,33 @@
 // ===================== Desktop clock =====================
 // A second, invisible "bar" behind the windows that only shows a big clock + date.
 // Windows cover it like a desktop widget; it takes no space and lets clicks through.
+// One copy per monitor: on the main monitor it sits below the top bar (+48px),
+// so the side monitor's copy gets 48px more margin to line up at the same height.
 {
     "name": "desktop",             // CSS: window#waybar.desktop
     "output": "HDMI-A-1",
     "layer": "bottom",             // below windows
     "position": "top",
-    "margin-top": 200,             // distance from the top of the screen
+    "margin-top": 200,             // distance below the top bar
     "exclusive": false,            // don't push windows away
     "passthrough": true,           // clicks go through to the desktop
+    "modules-center": ["group/desktop-clock"],
+
+    "group/desktop-clock": {
+        "orientation": "vertical",
+        "modules": ["clock#time", "clock#date"]
+    },
+    "clock#time": { "format": "{:%H:%M}", "tooltip": false },
+    "clock#date": { "format": "{:%A, %d %B %Y}", "tooltip": false, "interval": 60 }
+},
+{
+    "name": "desktop",
+    "output": "HDMI-A-2",          // side monitor (no top bar)
+    "layer": "bottom",
+    "position": "top",
+    "margin-top": 248,             // 200 + top bar height on the main monitor
+    "exclusive": false,
+    "passthrough": true,
     "modules-center": ["group/desktop-clock"],
 
     "group/desktop-clock": {
