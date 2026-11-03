@@ -3,9 +3,9 @@
 # Prepares the login screen's console (tty1 only), then starts tuigreet.
 # Layout/options live in /etc/tuigreet/config.toml.
 
-# Bigger text: 12x22 font instead of the tiny default 8x16.
+# Normal-size text: Terminus 8x16 (sharper than the default font). Bigger: sun12x22
 # Other fonts: ls /usr/share/kbd/consolefonts  (avoid 512-glyph ones, they lose colors)
-setfont sun12x22 2>/dev/null
+setfont Lat2-Terminus16 2>/dev/null
 
 # Console colors = your Hyprland theme (same palette as Alacritty).
 # Format: ESC ] P <index 0-f> <RRGGBB>.  tuigreet's theme names map to these:

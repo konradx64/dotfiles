@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# wallpaper-picker — pick a wallpaper from a thumbnail grid (rofi), then apply it
+# with `wallpaper`, which also recolors everything via matugen.
+# Opened with SUPER+W. Pressing the key again closes it.
+#
+# Shows every image in ~/Pictures/Wallpapers (jpg/jpeg/png/webp; overview.jpg is skipped).
+# Drop new images into that folder and they show up automatically.
+# Thumbnails are cached in ~/.cache/wallpaper-picker (only rebuilt when an image changes).
+
+pkill -x rofi && exit 0   # toggle: close if a rofi menu is already open
+
+dir="$HOME/Pictures/Wallpapers"
+cache="$HOME/.cache/wallpaper-picker"
+mkdir -p "$cache"
+
+# Current wallpaper (to preselect it)
+current=$(sed -n 's|^\s*path\s*=\s*||p' "$HOME/.config/hypr/hyprpaper.conf" | head -1)
+
+files=()
+labels=()
+thumbs=()
+selected=0
+shopt -s nullglob
+for f in "$dir"/*; do            # one glob = one alphabetical list across all file types
+    name=$(basename -- "$f")
+    case "${name,,}" in overview.jpg) continue ;; *.jpg|*.jpeg|*.png|*.webp) ;; *) continue ;; esac
+
+    # 256x144 thumbnail = exactly the size shown, so it stays sharp
+    thumb="$cache/${name%.*}.jpg"
+    if [[ ! -s "$thumb" || "$f" -nt "$thumb" ]]; then
+        magick "$f" -thumbnail 256x144^ -gravity center -extent 256x144 \
+            -quality 90 "$thumb" 2>/dev/null || continue
+    fi
+
+    [[ "$f" == "$current" ]] && selected=${#files[@]}
+    files+=("$f")
+    label="${name%.*}"; label="${label//[-_]/ }"   # "forest-red-sun.jpg" -> "forest red sun"
+    labels+=("$label")
+    thumbs+=("$thumb")
+done
+shopt -u nullglob
+
+(( ${#files[@]} )) || { notify-send "Wallpaper picker" "No images in $dir"; exit 1; }
+
+# Grid variant of the launcher theme (~/.config/rofi/config.rasi): 4 columns x 3 rows.
+# element-icon: rofi always reserves a square box (256x256) for an image, so a 16:9
+# thumbnail (256x144) would get 56px of empty space above and below it. The negative
+# margin cuts that away. Undocumented trick that works on rofi 2.0; if a future rofi
+# update makes this grid look broken, delete the "margin" part of element-icon.
+theme='window   { width: 1160px; }
+       entry    { placeholder: "Search wallpapers..."; }
+       listview { columns: 4; lines: 3; spacing: 10px; flow: horizontal; }
+       element  { orientation: vertical; padding: 8px; spacing: 6px; border-radius: 12px; }
+       element-icon { size: 256px; margin: -56px 0px; }
+       element-text { horizontal-align: 0.5; }'
+
+# rofi dmenu entry with an image: "label\0icon\x1fpath" (NUL can't live in a bash variable,
+# so it is added here while printing)
+index=$(for i in "${!files[@]}"; do printf '%s\0icon\x1f%s\n' "${labels[$i]}" "${thumbs[$i]}"; done |
+    rofi -dmenu -i -p "Wallpaper" -format i -selected-row "$selected" \
+         -theme-str "$theme" -no-custom)
+
+[[ -n "$index" ]] || exit 0
+"$HOME/.local/bin/wallpaper" "${files[$index]}" >/dev/null

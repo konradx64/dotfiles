@@ -7,6 +7,11 @@
 // as a "\uXXXX" escape using its 4-digit code (e.g. "\uf303" = Arch logo).
 [
 {
+    // Re-read style.css (and the colors.css it imports) whenever they change, without
+    // rebuilding the modules. A full reload (SIGUSR2) on every wallpaper change crashed
+    // Waybar when the media player (mpris) updated at the same moment (2026-11-03).
+    "reload_style_on_change": true,
+
     "output": "HDMI-A-1",
     "layer": "top",
     "position": "top",
@@ -216,7 +221,7 @@
     "output": "HDMI-A-1",
     "layer": "bottom",             // below windows
     "position": "top",
-    "margin-top": 200,             // distance below the top bar
+    "margin-top": 397,             // distance below the top bar: 48 + 397 + 172/2 ≈ screen center (1080/2)
     "exclusive": false,            // don't push windows away
     "passthrough": true,           // clicks go through to the desktop
     "modules-center": ["group/desktop-clock"],
@@ -233,7 +238,7 @@
     "output": "HDMI-A-2",          // side monitor (no top bar)
     "layer": "bottom",
     "position": "top",
-    "margin-top": 248,             // 200 + top bar height on the main monitor
+    "margin-top": 445,             // 397 + top bar height on the main monitor
     "exclusive": false,
     "passthrough": true,
     "modules-center": ["group/desktop-clock"],

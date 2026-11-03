@@ -4,33 +4,33 @@
 # (see [config.custom_colors] in ~/.config/matugen/config.toml).
 
 [colors.primary]
-background = "#0f1417"
-foreground = "#dfe3e7"
+background = "#131318"
+foreground = "#e4e1e9"
 
 [colors.cursor]
-text   = "#00344a"
-cursor = "#90cef4"
+text   = "#262b61"
+cursor = "#bec2ff"
 
 [colors.selection]
-text       = "#c4e7ff"
-background = "#004c69"
+text       = "#e0e0ff"
+background = "#3d4279"
 
 [colors.normal]
-black   = "#313539"
+black   = "#34343a"
 red     = "#ffb1c7"
 green   = "#9bd4a1"
-yellow  = "#dbc66e"
-blue    = "#95cdf7"
+yellow  = "#faba72"
+blue    = "#a9c7ff"
 magenta = "#d8bafa"
-cyan    = "#87d1ea"
-white   = "#c0c7cd"
+cyan    = "#87d1eb"
+white   = "#c7c5d0"
 
 [colors.bright]
-black   = "#8b9297"
+black   = "#91909a"
 red     = "#ffd9e2"
 green   = "#b6f1bb"
-yellow  = "#f8e287"
-blue    = "#c9e6ff"
+yellow  = "#ffddba"
+blue    = "#d6e3ff"
 magenta = "#eedbff"
-cyan    = "#b4ebff"
-white   = "#dfe3e7"
+cyan    = "#b6ebff"
+white   = "#e4e1e9"

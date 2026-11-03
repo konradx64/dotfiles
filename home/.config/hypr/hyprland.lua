@@ -280,8 +280,10 @@ hl.config({
 
 hl.config({
     misc = {
-        force_default_wallpaper = -1,    -- Set to 0 or 1 to disable the anime mascot wallpapers
-        disable_hyprland_logo   = false, -- If true disables the random hyprland logo / anime girl background. :(
+        -- Built-in anime/logo wallpapers off: hyprpaper draws the real wallpaper anyway,
+        -- and a damaged /usr/share/hypr/wall2.png crashed Hyprland at startup (2026-11-03)
+        force_default_wallpaper = 0,
+        disable_hyprland_logo   = true,
 
         -- Turned-off monitors wake up on mouse movement or a key press
         mouse_move_enables_dpms = true,
@@ -355,6 +357,7 @@ hl.bind(mainMod .. " + Space",  hl.dsp.exec_cmd(menu),        { description = "A
 hl.bind(mainMod .. " + R",      hl.dsp.exec_cmd(menu),        { description = "App launcher" })
 hl.bind(mainMod .. " + E",      hl.dsp.exec_cmd(fileManager), { description = "File manager" })
 hl.bind(mainMod .. " + N",      hl.dsp.exec_cmd("swaync-client -t -sw"), { description = "Notification center" })
+hl.bind(mainMod .. " + W",      hl.dsp.exec_cmd("~/.local/bin/wallpaper-picker"), { description = "Wallpaper picker" })
 hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("pkill waybar; waybar"), { description = "Restart Waybar" })
 
 -- Windows

@@ -27,7 +27,8 @@ post_hook   = "hyprctl reload >/dev/null"
 [templates.waybar]
 input_path  = "~/.config/matugen/templates/waybar-colors.css"
 output_path = "~/.config/waybar/colors.css"
-post_hook   = "pkill -SIGUSR2 -x waybar || true"
+# No post_hook: Waybar reloads colors.css by itself ("reload_style_on_change" in its config).
+# The old full reload (pkill -SIGUSR2 waybar) could crash Waybar via the media player module.
 
 # swaync notifications + notification center
 [templates.swaync]

@@ -17,6 +17,7 @@
 
 # ---------- own scripts ----------
 .local/bin/wallpaper
+.local/bin/wallpaper-picker
 .local/bin/screenshot
 .local/bin/powermenu
 .local/bin/gamemode
