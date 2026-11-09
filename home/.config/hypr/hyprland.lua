@@ -94,9 +94,15 @@ hl.on("hyprland.start", function ()
     -- Plasma's own agent when you log into KDE.
     hl.exec_cmd("systemctl --user start hyprpolkitagent")
 
-    -- Status bar and notification daemon/center
-    hl.exec_cmd("waybar")
-    hl.exec_cmd("swaync")
+    -- Status bar and notification daemon/center, run as systemd user services so they
+    -- come back by themselves after a crash (Waybar's media module crashed it twice).
+    -- Hyprland's own hyprland-session.target stops them when you leave Hyprland, and they
+    -- aren't enabled, so KDE never starts them. Extra settings:
+    -- ~/.config/systemd/user/{waybar,swaync}.service.d/hyprland.conf
+    -- Check with: systemctl --user status waybar swaync
+    -- (retried once, in case the session target isn't up yet)
+    hl.exec_cmd("systemctl --user start waybar.service swaync.service || " ..
+                "{ sleep 2; systemctl --user start waybar.service swaync.service; }")
 
 
     -- Wallpaper (config: ~/.config/hypr/hyprpaper.conf)
@@ -170,8 +176,8 @@ hl.config({
             inactive_border = colors.outlineVariant,
         },
 
-        -- Set to true to enable resizing windows by clicking and dragging on borders and gaps
-        resize_on_border = false,
+        -- Resize windows by grabbing their edge (or the gap next to it) with the mouse, like in KDE
+        resize_on_border = true,
 
         -- Please see https://wiki.hypr.land/configuring/extra/tearing/ before you turn this on
         allow_tearing = false,
@@ -292,6 +298,12 @@ hl.config({
         -- Safety net: if hyprlock ever crashes while locked, it can be restarted
         -- from a TTY (CTRL+ALT+F3, log in, then: hyprctl --instance 0 dispatch 'hl.dsp.exec_cmd("hyprlock")')
         allow_session_lock_restore = true,
+
+        -- FreeSync (VRR): the S24F350s can match their refresh rate to the game's
+        -- FPS (48-72 Hz) for smoother play without tearing. 2 = only for fullscreen
+        -- windows, so the desktop stays at a fixed 72 Hz.
+        -- Check while a game runs fullscreen: hyprctl monitors | grep vrr  (-> true)
+        vrr = 2,
     },
 })
 
@@ -358,7 +370,7 @@ hl.bind(mainMod .. " + R",      hl.dsp.exec_cmd(menu),        { description = "A
 hl.bind(mainMod .. " + E",      hl.dsp.exec_cmd(fileManager), { description = "File manager" })
 hl.bind(mainMod .. " + N",      hl.dsp.exec_cmd("swaync-client -t -sw"), { description = "Notification center" })
 hl.bind(mainMod .. " + W",      hl.dsp.exec_cmd("~/.local/bin/wallpaper-picker"), { description = "Wallpaper picker" })
-hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("pkill waybar; waybar"), { description = "Restart Waybar" })
+hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("systemctl --user restart waybar.service"), { description = "Restart Waybar" })
 
 -- Windows
 hl.bind(mainMod .. " + Q",         hl.dsp.window.close(),                                          { description = "Close window" })
@@ -391,6 +403,14 @@ hl.bind(mainMod .. " + SHIFT + left",  hl.dsp.window.move({ direction = "left" }
 hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.move({ direction = "right" }))
 hl.bind(mainMod .. " + SHIFT + up",    hl.dsp.window.move({ direction = "up" }))
 hl.bind(mainMod .. " + SHIFT + down",  hl.dsp.window.move({ direction = "down" }))
+
+-- Resize the active window with mainMod + CTRL + arrow keys (hold to keep resizing).
+-- Right/down = bigger, left/up = smaller. Tiled windows give/take space from their neighbour.
+local resizeStep = 40 -- pixels per step
+hl.bind(mainMod .. " + CTRL + right", hl.dsp.window.resize({ x =  resizeStep, y = 0, relative = true }), { repeating = true, description = "Window wider" })
+hl.bind(mainMod .. " + CTRL + left",  hl.dsp.window.resize({ x = -resizeStep, y = 0, relative = true }), { repeating = true, description = "Window narrower" })
+hl.bind(mainMod .. " + CTRL + down",  hl.dsp.window.resize({ x = 0, y =  resizeStep, relative = true }), { repeating = true, description = "Window taller" })
+hl.bind(mainMod .. " + CTRL + up",    hl.dsp.window.resize({ x = 0, y = -resizeStep, relative = true }), { repeating = true, description = "Window shorter" })
 
 -- Switch workspaces with mainMod + [0-9]
 -- Move active window to a workspace with mainMod + SHIFT + [0-9]
@@ -514,10 +534,12 @@ hl.window_rule({
     move              = "monitor_w-496 monitor_h-286",
 })
 
--- Steam games may tear (lower input lag) — only takes effect while game mode is on (SUPER+G)
+-- Steam games may tear (lower input lag) — only takes effect while game mode is on (SUPER+G).
+-- content = "game" tells Hyprland it's a game, so moving the mouse doesn't break FreeSync.
 hl.window_rule({
     name  = "games-immediate",
     match = { class = "^(steam_app_\\d+|gamescope)$" },
 
     immediate = true,
+    content   = "game",
 })

@@ -29,6 +29,7 @@ check
 clang
 clblast
 cmake
+cmatrix
 cowsay
 cups
 ddcui
@@ -103,6 +104,8 @@ kdegraphics-thumbnailers
 kdeplasma-addons
 kdiskmark
 kglobalacceld
+kicad
+kicad-library
 kinfocenter
 kmenuedit
 knighttime

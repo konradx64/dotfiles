@@ -25,6 +25,10 @@
 # ---------- misc ----------
 .config/autostart/blueman.desktop
 
+# ---------- Waybar/swaync as services (auto-restart after a crash) ----------
+.config/systemd/user/waybar.service.d
+.config/systemd/user/swaync.service.d
+
 # ---------- system: login screen ----------
 /etc/greetd/config.toml
 /etc/greetd/tuigreet.sh
