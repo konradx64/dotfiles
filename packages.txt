@@ -265,6 +265,7 @@ typst
 union
 unrar
 unzip
+v4l2loopback-dkms
 valkey
 vde2
 vegeta

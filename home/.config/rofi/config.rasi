@@ -11,6 +11,7 @@ configuration {
     font:                "Noto Sans Medium 12.5";
     matching:            "fuzzy";
     sort:                true;
+    sorting-method:      "fzf";   /* rank by match quality (default levenshtein put exact app names far down) */
     hover-select:        true;
     me-select-entry:     "";
     me-accept-entry:     "MousePrimary";

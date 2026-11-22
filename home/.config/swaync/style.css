@@ -5,37 +5,37 @@
 @import url("file:///etc/xdg/swaync/style.css");
 
 :root {
-  --cc-bg: rgba(19, 19, 24, 0.92);
+  --cc-bg: rgba(18, 19, 24, 0.92);
   --noti-border-color: #46464f;
   --noti-bg: 31, 31, 37;
   --noti-bg-alpha: 0.95;
   --noti-bg-darker: #1b1b21;
-  --noti-bg-hover: #2a292f;
+  --noti-bg-hover: #29292f;
   --noti-bg-focus: #34343a;
   --noti-close-bg: #34343a;
   --noti-close-bg-hover: #46464f;
   --text-color: #e4e1e9;
-  --text-color-disabled: #91909a;
-  --bg-selected: #bec2ff;
+  --text-color-disabled: #90909a;
+  --bg-selected: #bbc3ff;
   --border-radius: 10px;
 }
 
 /* Same values for swaync's older @define-color fallbacks */
-@define-color cc-bg rgba(19, 19, 24, 0.92);
+@define-color cc-bg rgba(18, 19, 24, 0.92);
 @define-color noti-border-color #46464f;
 @define-color noti-bg rgba(31, 31, 37, 0.95);
 @define-color noti-bg-opaque #1f1f25;
 @define-color noti-bg-darker #1b1b21;
-@define-color noti-bg-hover #2a292f;
-@define-color noti-bg-hover-opaque #2a292f;
+@define-color noti-bg-hover #29292f;
+@define-color noti-bg-hover-opaque #29292f;
 @define-color noti-bg-focus #34343a;
 @define-color noti-close-bg #34343a;
 @define-color noti-close-bg-hover #46464f;
 @define-color text-color #e4e1e9;
-@define-color text-color-disabled #91909a;
-@define-color bg-selected #bec2ff;
+@define-color text-color-disabled #90909a;
+@define-color bg-selected #bbc3ff;
 
 /* Accent edge on each popup so new notifications stand out */
 .notification-row .notification-background .notification {
-  border-left: 3px solid #bec2ff;
+  border-left: 3px solid #bbc3ff;
 }
